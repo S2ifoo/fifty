@@ -7,6 +7,7 @@ import logging
 import os
 from api.config_handler import load_config, add_token, remove_token, update_settings
 from api.start import start_bots, stop_bots
+from pathlib import Path
 
 app = FastAPI()
 
@@ -18,8 +19,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# خدمة الملفات الثابتة
-app.mount("/static", StaticFiles(directory="public"), name="static")
+BASE_DIR = Path(__file__).resolve().parent
+app.mount("/static", StaticFiles(directory=BASE_DIR / "public"), name="static")
+
+# خدمة الملفات الثابتة بشكل مباشر
+@app.get("/static/{file_path:path}")
+async def serve_static(file_path: str):
+    static_path = BASE_DIR / "public" / file_path
+    if static_path.exists():
+        return FileResponse(static_path)
+    return Response("File not found", status_code=404)
+
+# خدمة الصفحة الرئيسية
+@app.get("/", response_class=HTMLResponse)
+async def serve_ui():
+    return FileResponse(BASE_DIR / "public" / "index.html")
+
 
 # بدء البوتات عند التشغيل إذا كان الإعداد auto_start مفعل
 @app.on_event("startup")
@@ -28,6 +43,7 @@ async def startup_event():
     if config and config['settings']['auto_start']:
         start_bots()
         logging.info("تم بدء البوتات تلقائياً")
+
 
 # واجهة API للتحكم في البوتات
 @app.post("/api/start")
@@ -68,6 +84,7 @@ async def api_update_settings(request: Request):
     if update_settings(data):
         return {"status": "success"}
     raise HTTPException(status_code=400, detail="فشل في تحديث الإعدادات")
+
 
 # واجهة المستخدم
 @app.get("/", response_class=HTMLResponse)
