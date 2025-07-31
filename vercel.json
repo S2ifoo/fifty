@@ -8,10 +8,14 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "public/$1"
+      "dest": "main.py"
     },
     {
-      "src": "/(.*)",
+      "src": "/",
+      "dest": "main.py"
+    },
+    {
+      "src": "/api/(.*)",
       "dest": "main.py"
     }
   ]
