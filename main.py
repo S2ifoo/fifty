@@ -8,6 +8,9 @@ import os
 from api.config_handler import load_config, add_token, remove_token, update_settings
 from api.start import start_bots, stop_bots
 from pathlib import Path
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 
 app = FastAPI()
 
