@@ -3,18 +3,22 @@ import os
 import logging
 
 logger = logging.getLogger(__name__)
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.json')
+CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json')
 
 def load_config():
     """تحميل ملف التكوين"""
     try:
+        logger.info(f"Loading config from: {CONFIG_PATH}")
+        if not os.path.exists(CONFIG_PATH):
+            logger.warning("Config file not found. Creating default config.")
+            return create_default_config()
+            
         with open(CONFIG_PATH, 'r') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        logger.error("Config file not found. Creating default config.")
-        return create_default_config()
-    except json.JSONDecodeError as e:
-        logger.error(f"Error parsing config file: {e}")
+            config = json.load(f)
+            logger.info("Config loaded successfully")
+            return config
+    except Exception as e:
+        logger.error(f"Error loading config: {str(e)}")
         return None
 
 def save_config(config):
