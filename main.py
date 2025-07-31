@@ -9,8 +9,7 @@ from api.config_handler import load_config, add_token, remove_token, update_sett
 from api.start import start_bots, stop_bots
 from pathlib import Path
 import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
+app.mount("/static", StaticFiles(directory=BASE_DIR / "output" / "public"), name="static")
 
 app = FastAPI()
 
@@ -24,6 +23,15 @@ app.add_middleware(
 
 BASE_DIR = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory=BASE_DIR / "public"), name="static")
+
+# خدمة ملفات CSS وJS مباشرة
+@app.get("/style.css")
+async def serve_css():
+    return FileResponse(BASE_DIR / "public" / "style.css")
+
+@app.get("/script.js")
+async def serve_js():
+    return FileResponse(BASE_DIR / "public" / "script.js")
 
 # خدمة الملفات الثابتة بشكل مباشر
 @app.get("/static/{file_path:path}")
