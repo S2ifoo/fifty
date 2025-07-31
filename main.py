@@ -531,14 +531,6 @@ def main():
         # for bot in bots_gw:
         #     bot.stop()
         logging.info("All bots stopped.")
-from flask import Flask
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "Project Auto Reaction is running!"
-
-app.run(host='0.0.0.0', port=3000)
 
 
 if __name__ == '__main__':
